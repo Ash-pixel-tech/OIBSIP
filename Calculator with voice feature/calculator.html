@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ash Calculator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: url('file:///C:/Users/ashle/Downloads/vecteezy_pastel-colored-sky-reflected-in-gentle-waves-of-beach-at_48617137.jpg') no-repeat center center fixed;
+      background-size: cover;
+      transition: background 0.5s, color 0.5s;
+    }
+    body.dark-mode {
+      color: #eee;
+    }
+    .calculator {
+      width: 320px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      padding: 15px;
+      transition: background 0.5s;
+    }
+    body.dark-mode .calculator {
+      background: rgba(50,50,50,0.95);
+    }
+    .screen {
+      background: #F0F8FF;
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: background 0.5s, color 0.5s;
+    }
+    body.dark-mode .screen {
+      background: #333;
+      color: #fff;
+    }
+    .screen .question {
+      text-align: left;
+      font-size: 1em;
+      opacity: 0.7;
+    }
+    .screen .result {
+      text-align: right;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .buttons-last-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .btn {
+      height: 45px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      background: #E6E6FA;
+      color: #4B0082;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .btn:active {
+      background: #D8BFD8;
+      transform: scale(0.98);
+    }
+    body.dark-mode .btn {
+      background: #555;
+      color: #fff;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+    }
+    .controls div {
+      flex: 1;
+      margin: 0 4px;
+      cursor: pointer;
+      font-size: 1em;
+      padding: 8px;
+      text-align: center;
+      border-radius: 8px;
+      background: #E6E6FA;
+      color: #4B0082;
+      transition: background 0.3s;
+    }
+    .controls div:hover {
+      background: #D8BFD8;
+    }
+    body.dark-mode .controls div {
+      background: #555;
+      color: #fff;
+    }
+    body.dark-mode .controls div:hover {
+      background: #444;
+    }
+    #historyContainer {
+      width: 320px;
+      margin: 30px auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      padding: 15px;
+      display: none;
+      transition: background 0.5s;
+    }
+    body.dark-mode #historyContainer {
+      background: rgba(50,50,50,0.95);
+    }
+    #historyContainer .history-header {
+      font-size: 1.5em;
+      text-align: center;
+      margin-bottom: 10px;
+      color: #222;
+    }
+    body.dark-mode #historyContainer .history-header {
+      color: #ccc;
+    }
+    #historyContainer .history {
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 0.9em;
+      color: #444;
+    }
+    body.dark-mode #historyContainer .history {
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator" id="calcContainer">
+    <div class="screen">
+      <div class="question" id="question"></div>
+      <div class="result" id="result"></div>
+    </div>
+    <div class="buttons">
+      <button class="btn" onclick="appendValue('(')"> ( </button>
+      <button class="btn" onclick="appendValue(')')"> ) </button>
+      <button class="btn" onclick="ansPressed()"> Ans </button>
+      <button class="btn" onclick="clearScreen()"> Clear </button>
+      <button class="btn" onclick="backspace()"> DEL </button>
+      <button class="btn" onclick="appendValue('7')"> 7 </button>
+      <button class="btn" onclick="appendValue('8')"> 8 </button>
+      <button class="btn" onclick="appendValue('9')"> 9 </button>
+      <button class="btn" onclick="appendValue('÷')"> ÷ </button>
+      <button class="btn" onclick="appendValue('%')"> % </button>
+      <button class="btn" onclick="appendValue('4')"> 4 </button>
+      <button class="btn" onclick="appendValue('5')"> 5 </button>
+      <button class="btn" onclick="appendValue('6')"> 6 </button>
+      <button class="btn" onclick="appendValue('×')"> × </button>
+      <button class="btn" onclick="appendValue('√')"> √ </button>
+      <button class="btn" onclick="appendValue('1')"> 1 </button>
+      <button class="btn" onclick="appendValue('2')"> 2 </button>
+      <button class="btn" onclick="appendValue('3')"> 3 </button>
+      <button class="btn" onclick="appendValue('–')"> – </button>
+      <button class="btn" onclick="appendValue('+')"> + </button>
+    </div>
+    <div class="buttons-last-row">
+      <button class="btn" onclick="appendValue('0')"> 0 </button>
+      <button class="btn" onclick="appendValue('.')"> . </button>
+      <button class="btn" onclick="toggleSign()"> ± </button>
+      <button class="btn" onclick="enterPressed()"> = </button>
+    </div>
+    <div class="controls">
+      <div onclick="toggleTheme()"> Switch Mode </div>
+      <div onclick="startVoiceRecognition()"> Voice Input </div>
+      <div onclick="showHistory()"> History </div>
+    </div>
+  </div>
+  
+  <div class="calculator" id="historyContainer">
+    <div class="history-header"> History </div>
+    <div class="history" id="history"></div>
+    <div class="controls">
+      <div onclick="hideHistory()"> Back </div>
+      <div onclick="clearHistory()"> Clear History </div>
+    </div>
+  </div>
+  
+  <script>
+    let lastAnswer = '';
+    let voiceMode = false;
+    
+    const questionField = document.getElementById('question');
+    const resultField = document.getElementById('result');
+    const historyDiv = document.getElementById('history');
+    const calcContainer = document.getElementById('calcContainer');
+    const historyContainer = document.getElementById('historyContainer');
+    
+    function appendValue(value) {
+      resultField.textContent += value;
+    }
+    
+    function clearScreen() {
+      questionField.textContent = '';
+      resultField.textContent = '';
+    }
+    
+    function backspace() {
+      resultField.textContent = resultField.textContent.slice(0, -1);
+    }
+    
+    function toggleSign() {
+      let current = resultField.textContent.trim();
+      if (!current) return;
+      if (current.charAt(0) === '-') {
+        resultField.textContent = current.substring(1);
+      } else {
+        resultField.textContent = '-' + current;
+      }
+    }
+    
+    function enterPressed() {
+      let expression = resultField.textContent.trim();
+      if (expression === '') return;
+      expression = expression.replace(/÷/g, '/').replace(/×/g, '*');
+      expression = expression.replace(/(\d+)%/g, "($1*0.01)");
+      let sqrtCount = (expression.match(/√/g) || []).length;
+      expression = expression.replace(/√/g, "Math.sqrt(") + ')'.repeat(sqrtCount);
+      expression = expression.replace(/π/g, "Math.PI");
+      
+      questionField.textContent = expression;
+      try {
+        const answer = eval(expression);
+        resultField.textContent = answer;
+        lastAnswer = answer;
+        appendHistory(questionField.textContent + ' = ' + answer);
+        if (voiceMode) {
+          speakResult(answer);
+          voiceMode = false;
+        }
+      } catch (e) {
+        resultField.textContent = 'Error';
+      }
+    }
+    
+    function ansPressed() {
+      resultField.textContent += lastAnswer;
+    }
+    
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+    }
+    
+    function showHistory() {
+      calcContainer.style.display = 'none';
+      historyContainer.style.display = 'block';
+    }
+    
+    function hideHistory() {
+      historyContainer.style.display = 'none';
+      calcContainer.style.display = 'block';
+    }
+    
+    function clearHistory() {
+      historyDiv.innerHTML = '';
+    }
+    
+    function startVoiceRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Your browser doesn't support voice recognition.");
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      
+      recognition.onresult = function(event) {
+        let transcript = event.results[0][0].transcript.toLowerCase();
+        transcript = transcript.replace(/plus/g, '+')
+                               .replace(/minus/g, '-')
+                               .replace(/times|x/g, '*')
+                               .replace(/divided by/g, '/')
+                               .replace(/equals|equal/g, '');
+        resultField.textContent = transcript.trim();
+        voiceMode = true;
+        if (resultField.textContent.length > 0) {
+          enterPressed();
+        }
+      };
+      
+      recognition.onerror = function(event) {
+        console.error('Voice recognition error:', event.error);
+      };
+      
+      recognition.start();
+    }
+    
+    function speakResult(result) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance('The result is ' + result);
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+    
+    function appendHistory(entry) {
+      const historyItem = document.createElement('div');
+      historyItem.textContent = entry;
+      historyItem.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+      historyItem.style.padding = '5px 0';
+      historyDiv.prepend(historyItem);
+      if (historyDiv.childNodes.length > 10) {
+        historyDiv.removeChild(historyDiv.lastChild);
+      }
+    }
+  </script>
+</body>
+</html>
