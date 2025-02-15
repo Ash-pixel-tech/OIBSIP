@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <style>
+    body {
+      background: url("{{ url_for('static', filename='cloud_background.jpg') }}")
+                  no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      position: relative;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1;
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding-top: 100px;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+    a.button {
+      background: #28a745;
+      color: #fff;
+      padding: 15px 25px;
+      text-decoration: none;
+      margin: 10px;
+      border-radius: 5px;
+      font-size: 1.2em;
+      border: none;
+    }
+    a.button:hover {
+      background: #1e7e34;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="container">
+    <h1>Welcome</h1>
+    <a class="button" href="{{ url_for('login') }}">Login</a>
+    <a class="button" href="{{ url_for('register') }}">Register</a>
+  </div>
+</body>
+</html>
