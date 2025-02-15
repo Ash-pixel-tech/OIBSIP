@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do Mate</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff0f5;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #ffc0cb;
+      color: #333;
+      padding: 1rem;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    main {
+      flex: 1;
+      max-width: 900px;
+      margin: 2rem auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+    }
+
+    .task-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .task-form input, .task-form textarea {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .task-form button {
+      background: #ff69b4;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .task-form button:hover {
+      background: #ff1493;
+    }
+
+    .tasks-container {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .tasks-list {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .tasks-list h2 {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      color: #ff69b4;
+      border-bottom: 2px solid #ff69b4;
+      padding-bottom: 0.3rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: #ffe4e1;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.8rem;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+
+    .action-btn {
+      cursor: pointer;
+      border: none;
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+      color: white;
+      font-size: 0.9rem;
+      margin-right: 0.3rem;
+    }
+
+    .action-btn.edit {
+      background: #ffc107;
+    }
+
+    .action-btn.delete {
+      background: #dc3545;
+    }
+
+    .action-btn.complete {
+      background: #198754;
+    }
+
+    .action-btn:hover {
+      opacity: 0.9;
+    }
+
+    footer {
+      background: #ffc0cb;
+      color: #333;
+      text-align: center;
+      padding: 0.8rem 0;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Smart Task Management for a Productive You..!</h1>
+</header>
+
+<main>
+  <form class="task-form" id="taskForm">
+    <label for="taskTitle">Title</label>
+    <input type="text" id="taskTitle" placeholder="Enter task title..." required />
+
+    <label for="taskDesc">Description</label>
+    <textarea id="taskDesc" rows="3" placeholder="Enter task description..." required></textarea>
+
+    <button type="submit" id="submitBtn">Save</button>
+  </form>
+
+  <div class="tasks-container">
+    <div class="tasks-list">
+      <h2>Pending Tasks</h2>
+      <table id="pendingTable">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Date Added</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="tasks-list">
+      <h2>Completed Tasks</h2>
+      <table id="completedTable">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Completed On</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2025 To-Do App. All rights reserved.</p>
+</footer>
+
+<script>
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  let currentId = tasks.length ? Math.max(...tasks.map(t => t.id)) + 1 : 0;
+  const taskForm = document.getElementById('taskForm');
+  const taskTitle = document.getElementById('taskTitle');
+  const taskDesc = document.getElementById('taskDesc');
+  const submitBtn = document.getElementById('submitBtn');
+  const pendingTableBody = document.querySelector('#pendingTable tbody');
+  const completedTableBody = document.querySelector('#completedTable tbody');
+
+  function createTask(title, description) {
+    return { id: currentId++, title, description, dateAdded: new Date(), completed: false };
+  }
+
+  function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+
+  function renderTasks() {
+    pendingTableBody.innerHTML = '';
+    completedTableBody.innerHTML = '';
+
+    tasks.forEach(task => {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${task.title}</td><td>${task.description}</td><td>${new Date(task.completed ? task.dateCompleted : task.dateAdded).toLocaleString()}</td><td></td>`;
+      
+      const actionCell = row.querySelector('td:last-child');
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'action-btn delete';
+      deleteBtn.textContent = 'X';
+      deleteBtn.onclick = () => {
+        tasks = tasks.filter(t => t.id !== task.id);
+        saveTasks();
+        renderTasks();
+      };
+      actionCell.appendChild(deleteBtn);
+
+      if (!task.completed) {
+        const editBtn = document.createElement('button');
+        editBtn.className = 'action-btn edit';
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => {
+          taskTitle.value = task.title;
+          taskDesc.value = task.description;
+          submitBtn.textContent = "Update Task";
+          taskForm.onsubmit = e => {
+            e.preventDefault();
+            task.title = taskTitle.value;
+            task.description = taskDesc.value;
+            saveTasks();
+            renderTasks();
+            taskTitle.value = '';
+            taskDesc.value = '';
+            submitBtn.textContent = "Save";
+            taskForm.onsubmit = addNewTask;
+          };
+        };
+        actionCell.appendChild(editBtn);
+      }
+
+      if (!task.completed) {
+        const completeBtn = document.createElement('button');
+        completeBtn.className = 'action-btn complete';
+        completeBtn.textContent = 'Done';
+        completeBtn.onclick = () => {
+          task.completed = true;
+          task.dateCompleted = new Date();
+          saveTasks();
+          renderTasks();
+        };
+        actionCell.appendChild(completeBtn);
+      }
+
+      if (!task.completed) {
+        pendingTableBody.appendChild(row);
+      } else {
+        completedTableBody.appendChild(row);
+      }
+    });
+  }
+
+  function addNewTask(e) {
+    e.preventDefault();
+    tasks.push(createTask(taskTitle.value, taskDesc.value));
+    saveTasks();
+    renderTasks();
+    taskTitle.value = '';
+    taskDesc.value = '';
+  }
+
+  taskForm.onsubmit = addNewTask;
+  renderTasks();
+</script>
+
+</body>
+</html>
